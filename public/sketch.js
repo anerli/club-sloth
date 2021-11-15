@@ -7,7 +7,7 @@ const states = {
 
 let state = states.LOGIN;
 let username = '';
-
+let sloth_img_paths = [];
 
 function setup() {
   createCanvas(1200, 600);
@@ -35,6 +35,12 @@ function setup() {
     username = inp.value();
     // Delete extra DOM elements
     //removeElements();
+  });
+
+  // Get sloths
+  httpGet('http://localhost:3000/sloths', (res) => {
+    console.log(res);
+    sloth_img_paths = res.sloths;
   });
 
   let button = createButton('§¾¿×¬¶þ¤ǢʥʭѬ');

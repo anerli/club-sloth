@@ -5,6 +5,9 @@ const build_socket = (server) => {
 
   const fps = 30;
   const frame_time = 1000 / fps;
+
+  let players = {};
+
   setInterval(heartbeat, frame_time);
 
   function heartbeat(){
@@ -18,8 +21,13 @@ const build_socket = (server) => {
       
       // Example signal. Client side would be: socket.emit('mysignal', data)
       socket.on('mysignal', (data) => {
-          console.log('Recieved:', data);
+        console.log('Recieved:', data);
       });
+
+      socket.on('login', (username) => {
+        console.log('Recieved Login:', username);
+        players[socket.id] = username;
+      })
   }
 }
 
