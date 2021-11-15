@@ -11,7 +11,7 @@ const build_socket = (server) => {
   setInterval(heartbeat, frame_time);
 
   function heartbeat(){
-      io.sockets.emit('heartbeat', {example_message: 'Hello all!'});
+      io.sockets.emit('heartbeat', {players: players});
   }
 
   io.sockets.on('connection', new_conn);
@@ -26,7 +26,10 @@ const build_socket = (server) => {
 
       socket.on('login', (username) => {
         console.log('Recieved Login:', username);
-        players[socket.id] = username;
+        players[socket.id] = {
+          username: username,
+          position: {x: 0, y: 0}
+        };
       })
   }
 }

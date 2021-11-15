@@ -9,10 +9,16 @@ var state = states.LOGIN;
 var username = '';
 var sloth_img_paths = [];
 var avatar;
+var speed = 5;
+
+var x;
+var y;
 
 function setup() {
   createCanvas(1200, 600);
   colorMode(HSB, 255);
+
+  //random
 
   // May want this to match the FPS on server,
   // Alternatively can set frameRate to 0 and manually call draw in heartbeat.
@@ -66,8 +72,23 @@ function log_in(){
     console.log('avatar_path:', avatar_path);
     avatar = createImg(avatar_path);
     state = states.PLAYING;
+
+    x = 0;
+    y = 0;
   }
 }
+
+// function keyPressed() {
+//   if (keyCode === LEFT_ARROW) {
+//     x -= speed;
+//   } else if (keyCode === RIGHT_ARROW) {
+//     x += speed
+//   } else if (keyCode === UP_ARROW) {
+//     y -= speed;
+//   } else if (keyCode === DOWN_ARROW) {
+//     y += speed;
+//   }
+// }
 
 function draw() {
   background(220, 255, 255);
@@ -80,8 +101,23 @@ function draw() {
     textSize(24);
     text('WHAT IS YOUR NAME', 100, 100);
   } else if (state === states.PLAYING) {
-    avatar.position(mouseX, mouseY);
+    avatar.position(x, y);
     avatar.size(100, 100);
+
+    dir = createVector(0, 0);
+    if (keyIsDown(LEFT_ARROW)) {
+      dir.x -= 1;
+    } if (keyIsDown(RIGHT_ARROW)) {
+      dir.x += 1
+    } if (keyIsDown(UP_ARROW)) {
+      dir.y -= 1;
+    } if (keyIsDown(DOWN_ARROW)) {
+      dir.y += 1;
+    }
+    dir.normalize();
+    dir.mult(speed);
+    x += dir.x;
+    y += dir.y;
   }
 
 }
