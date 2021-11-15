@@ -1,0 +1,24 @@
+{
+  "name": "p5-socket-game",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anerli/p5-socket-game.git"
+  },
+  "author": "Anders Lie",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/anerli/p5-socket-game/issues"
+  },
+  "homepage": "https://github.com/anerli/p5-socket-game#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "socketio": "^1.0.0"
+  }
+}
