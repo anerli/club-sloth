@@ -1,13 +1,14 @@
-let socket;
+var socket;
 
 const states = {
   LOGIN: 'LOGIN',
   PLAYING: 'PLAYING'
 }
 
-let state = states.LOGIN;
-let username = '';
-let sloth_img_paths = [];
+var state = states.LOGIN;
+var username = '';
+var sloth_img_paths = [];
+var avatar;
 
 function setup() {
   createCanvas(1200, 600);
@@ -38,21 +39,34 @@ function setup() {
   });
 
   // Get sloths
-  httpGet('http://localhost:3000/sloths', (res) => {
+  // If you don't specify json, you get the data as a string
+  httpGet('http://localhost:3000/sloths', 'json', (res) => {
     console.log(res);
+    console.log(res.sloths);
     sloth_img_paths = res.sloths;
   });
 
   let button = createButton('§¾¿×¬¶þ¤ǢʥʭѬ');
   button.position(200, 300);
-  button.mousePressed(() => {
-    if (username.length > 0) {
-      socket.emit('login', {username: username});
-      console.log('Login: ' + username);
-      state = states.PLAYING;
-    }
+  button.mousePressed(log_in);
+}
+
+function log_in(){
+  if (username.length > 0) {
+    socket.emit('login', {username: username});
+    console.log('Login: ' + username);
     removeElements();
-  });
+
+    console.log('State:', state);
+    console.log('Sloth img paths: ' + sloth_img_paths);
+
+    // Hopefully image paths are loaded at this point
+    // random(sloth_img_paths); didn't work
+    let avatar_path = './sloths/' + sloth_img_paths[Math.floor(Math.random() * sloth_img_paths.length)];
+    console.log('avatar_path:', avatar_path);
+    avatar = createImg(avatar_path);
+    state = states.PLAYING;
+  }
 }
 
 function draw() {
@@ -65,6 +79,9 @@ function draw() {
     text('WELCOME TO CLSLOTHþ UBCLUB SLOTHʭѬ', 50, 50);
     textSize(24);
     text('WHAT IS YOUR NAME', 100, 100);
+  } else if (state === states.PLAYING) {
+    avatar.position(mouseX, mouseY);
+    avatar.size(100, 100);
   }
 
 }
