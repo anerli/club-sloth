@@ -102,9 +102,14 @@ function draw_chat(msg, x, y) {
 
 function keyPressed() {
   // console.log(state);
+  // console.log(keyCode);
+  // console.log(username);
   // console.log(state == states.PLAYING);
   // console.log(keyCode === ENTER);
   // console.log(chat_message.length > 0);
+  if (state === states.LOGIN && keyCode === ENTER && username.length > 0) {
+    log_in();
+  }
   if (state === states.PLAYING && keyCode === ENTER && chat_message.length > 0) {
     console.log('sent:', chat_message);
     socket.emit('chat', chat_message);
