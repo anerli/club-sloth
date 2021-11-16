@@ -11,7 +11,7 @@ var sloth_img_paths = [];
 var avatar_images = {};
 var avatar;
 var speed = 5;
-var players = {};
+var players = [];
 
 var x;
 var y;
@@ -28,8 +28,8 @@ function setup() {
 
   socket = io.connect('http://localhost:3000');
 
-  socket.on('heartbeat', (players) => {
-    console.log(players);
+  socket.on('heartbeat', (data) => {
+    players = data.players;   
   });
 
   // Setup any other event listeners here
@@ -55,6 +55,7 @@ function setup() {
     sloth_img_paths.forEach((sloth_img_path) => {
       avatar_images[sloth_img_path] = loadImage('./sloths/' + sloth_img_path);
     });
+    console.log('avatar images:', avatar_images);
   });
 
   let button = createButton('§¾¿×¬¶þ¤ǢʥʭѬ');
@@ -106,6 +107,19 @@ function log_in(){
 function draw_players() {
   // let img = avatar_images[avatar_path];
   // image(img, x, y);
+  //console.log('players:', players);
+  //console.log(avatar_images);
+  for (let i = 0; i < players.length; i++) {
+    player = players[i];
+    //console.log('Drawing user: ', player.username)
+    //console.log(player.avatar);
+    
+    let img = avatar_images[player.avatar];
+    image(img, player.position.x, player.position.y);
+    //image (img, 200, 200);
+  }
+  //console.log(avatar_images['sloth1.png']);
+  image(avatar_images['sloth1.png'], 400, 400);
 }
 
 function draw() {
