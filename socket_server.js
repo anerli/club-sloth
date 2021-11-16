@@ -11,7 +11,11 @@ const build_socket = (server) => {
   setInterval(heartbeat, frame_time);
 
   function heartbeat(){
-      io.sockets.emit('heartbeat', {players: players});
+      let player_list = [];
+      for (key in players){
+        player_list.push(players[key]);
+      }
+      io.sockets.emit('heartbeat', {players: player_list});
   }
 
   io.sockets.on('connection', new_conn);
@@ -24,13 +28,16 @@ const build_socket = (server) => {
         console.log('Recieved:', data);
       });
 
-      socket.on('login', (username) => {
-        console.log('Recieved Login:', username);
-        players[socket.id] = {
-          username: username,
-          position: {x: 0, y: 0}
-        };
+      socket.on('login', (userdata) => {
+        console.log('Recieved Login:', userdata);
+        // Should include username, avatar, and position
+        players[socket.id] = userdata;
       })
+
+      socket.on('move', (pos) => {
+        //console.log('Recieved Move:', pos);
+        players[socket.id].position = pos;
+      });
   }
 }
 

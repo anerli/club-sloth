@@ -8,8 +8,10 @@ const states = {
 var state = states.LOGIN;
 var username = '';
 var sloth_img_paths = [];
+var avatar_images = {};
 var avatar;
 var speed = 5;
+var players = {};
 
 var x;
 var y;
@@ -26,8 +28,8 @@ function setup() {
 
   socket = io.connect('http://localhost:3000');
 
-  socket.on('heartbeat', (data) => {
-
+  socket.on('heartbeat', (players) => {
+    console.log(players);
   });
 
   // Setup any other event listeners here
@@ -50,6 +52,9 @@ function setup() {
     console.log(res);
     console.log(res.sloths);
     sloth_img_paths = res.sloths;
+    sloth_img_paths.forEach((sloth_img_path) => {
+      avatar_images[sloth_img_path] = loadImage('./sloths/' + sloth_img_path);
+    });
   });
 
   let button = createButton('§¾¿×¬¶þ¤ǢʥʭѬ');
@@ -59,8 +64,8 @@ function setup() {
 
 function log_in(){
   if (username.length > 0) {
-    socket.emit('login', {username: username});
     console.log('Login: ' + username);
+    
     removeElements();
 
     console.log('State:', state);
@@ -68,13 +73,22 @@ function log_in(){
 
     // Hopefully image paths are loaded at this point
     // random(sloth_img_paths); didn't work
-    let avatar_path = './sloths/' + sloth_img_paths[Math.floor(Math.random() * sloth_img_paths.length)];
+    let avatar_path = sloth_img_paths[Math.floor(Math.random() * sloth_img_paths.length)];
     console.log('avatar_path:', avatar_path);
-    avatar = createImg(avatar_path);
-    state = states.PLAYING;
+    
+    // avatar = createImg(avatar_path);
+    // avatar.size(100, 100);
 
     x = 0;
     y = 0;
+
+    socket.emit('login', {
+      username: username,
+      avatar: avatar_path,
+      position: {x: x, y: y}
+    });
+
+    state = states.PLAYING;
   }
 }
 
@@ -89,6 +103,10 @@ function log_in(){
 //     y += speed;
 //   }
 // }
+function draw_players() {
+  // let img = avatar_images[avatar_path];
+  // image(img, x, y);
+}
 
 function draw() {
   background(220, 255, 255);
@@ -101,8 +119,10 @@ function draw() {
     textSize(24);
     text('WHAT IS YOUR NAME', 100, 100);
   } else if (state === states.PLAYING) {
-    avatar.position(x, y);
-    avatar.size(100, 100);
+    draw_players();
+
+    //avatar.position(x, y);
+    //avatar.size(100, 100);
 
     dir = createVector(0, 0);
     if (keyIsDown(LEFT_ARROW)) {
@@ -116,8 +136,13 @@ function draw() {
     }
     dir.normalize();
     dir.mult(speed);
+
     x += dir.x;
     y += dir.y;
+
+    if (dir.x > 0 || dir.y > 0) {
+      socket.emit('move', {x: x, y: y});
+    }
   }
 
 }
