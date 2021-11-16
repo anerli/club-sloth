@@ -25,7 +25,7 @@ var last_msg = '';
 var id;
 
 function setup() {
-  createCanvas(800, 600);
+  createCanvas(1200, 600);
   colorMode(HSB, 255);
 
   // May want this to match the FPS on server,
@@ -180,7 +180,8 @@ function draw() {
   if (state === states.LOGIN) {
     background(200, 255, 255);
     textSize(32);
-    text('WELCOME TO CLSLOTHþ UBCLUB SLOTHʭѬ', 50, 50);
+    //text('WELCOME TO CLSLOTHþ UBCLUB SLOTHʭѬ', 50, 50);
+    text('WELCOME TO CLUB SLOTH', 50, 50);
     textSize(24);
     text('WHAT IS YOUR NAME', 100, 100);
   } else if (state === states.LOADING) {
