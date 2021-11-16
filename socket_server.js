@@ -15,7 +15,7 @@ const build_socket = (server) => {
       for (key in players){
         player_list.push(players[key]);
       }
-      io.sockets.emit('heartbeat', {players: player_list});
+      io.sockets.emit('heartbeat', players);
   }
 
   io.sockets.on('connection', new_conn);
@@ -32,6 +32,10 @@ const build_socket = (server) => {
         console.log('Recieved Login:', userdata);
         // Should include username, avatar, and position
         players[socket.id] = userdata;
+        
+
+        // Delay slightly so client has time to load in self as user.
+        setTimeout(()=>{socket.emit('login_success', {'id': socket.id})}, frame_time);
       })
 
       socket.on('move', (pos) => {

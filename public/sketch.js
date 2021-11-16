@@ -2,6 +2,7 @@ var socket;
 
 const states = {
   LOGIN: 'LOGIN',
+  LOADING: 'LOADING',
   PLAYING: 'PLAYING'
 }
 
@@ -15,6 +16,9 @@ var players = [];
 
 var x;
 var y;
+var avatar;
+
+var id;
 
 function setup() {
   createCanvas(1200, 600);
@@ -29,8 +33,16 @@ function setup() {
   socket = io.connect('http://localhost:3000');
 
   socket.on('heartbeat', (data) => {
-    players = data.players;   
+    players = data;   
   });
+
+  socket.on('login_success', (data) => {
+    if (state === states.LOADING) {
+      id = data.id;
+      console.log('My ID:', id)
+      state = states.PLAYING;
+    }
+  })
 
   // Setup any other event listeners here
 
@@ -74,22 +86,24 @@ function log_in(){
 
     // Hopefully image paths are loaded at this point
     // random(sloth_img_paths); didn't work
-    let avatar_path = sloth_img_paths[Math.floor(Math.random() * sloth_img_paths.length)];
-    console.log('avatar_path:', avatar_path);
+    avatar = sloth_img_paths[Math.floor(Math.random() * sloth_img_paths.length)];
+    //console.log('avatar_path:', avatar_path);
     
     // avatar = createImg(avatar_path);
     // avatar.size(100, 100);
+
+    
 
     x = 0;
     y = 0;
 
     socket.emit('login', {
       username: username,
-      avatar: avatar_path,
+      avatar: avatar,
       position: {x: x, y: y}
     });
 
-    state = states.PLAYING;
+    state = states.LOADING;
   }
 }
 
@@ -107,10 +121,12 @@ function log_in(){
 function draw_players() {
   // let img = avatar_images[avatar_path];
   // image(img, x, y);
-  //console.log('players:', players);
+  console.log('players:', players);
   //console.log(avatar_images);
-  for (let i = 0; i < players.length; i++) {
-    player = players[i];
+  for (player_id in players) {
+    if (player_id == id) continue;
+
+    player = players[player_id];
     //console.log('Drawing user: ', player.username)
     //console.log(player.avatar);
     
@@ -120,6 +136,14 @@ function draw_players() {
   }
   //console.log(avatar_images['sloth1.png']);
   image(avatar_images['sloth1.png'], 400, 400);
+
+  console.log('x:', x);
+  console.log('y:', y);
+
+  // Draw self
+  // sometimes player is not in yet
+  //image(avatar_images[players[id].avatar], x, y, 100, 100);
+  image(avatar_images[avatar], x, y, 100, 100);
 }
 
 function draw() {
@@ -132,6 +156,9 @@ function draw() {
     text('WELCOME TO CLSLOTHþ UBCLUB SLOTHʭѬ', 50, 50);
     textSize(24);
     text('WHAT IS YOUR NAME', 100, 100);
+  } else if (state === states.LOADING) {
+    textSize(64);
+    text('CONNECTING...', 100, 100);
   } else if (state === states.PLAYING) {
     draw_players();
 
