@@ -11,10 +11,10 @@ const build_socket = (server) => {
   setInterval(heartbeat, frame_time);
 
   function heartbeat(){
-      let player_list = [];
-      for (key in players){
-        player_list.push(players[key]);
-      }
+      // let player_list = [];
+      // for (key in players){
+      //   player_list.push(players[key]);
+      // }
       io.sockets.emit('heartbeat', players);
   }
 
@@ -24,14 +24,16 @@ const build_socket = (server) => {
       console.log('New Connection: ' + socket.id);
       
       // Example signal. Client side would be: socket.emit('mysignal', data)
-      socket.on('mysignal', (data) => {
-        console.log('Recieved:', data);
+      socket.on('chat', (msg) => {
+        console.log('Recieved chat message:', msg);
+        players[socket.id].last_msg = msg;
       });
+
 
       socket.on('login', (userdata) => {
         console.log('Recieved Login:', userdata);
         // Should include username, avatar, and position
-        players[socket.id] = userdata;
+        players[socket.id] = {last_msg: '', ...userdata};
         
 
         // Delay slightly so client has time to load in self as user.

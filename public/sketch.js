@@ -18,10 +18,14 @@ var x;
 var y;
 var avatar;
 
+var chat_input;
+var chat_message = '';
+var last_msg = '';
+
 var id;
 
 function setup() {
-  createCanvas(1200, 600);
+  createCanvas(800, 600);
   colorMode(HSB, 255);
 
   // May want this to match the FPS on server,
@@ -39,6 +43,20 @@ function setup() {
       id = data.id;
       console.log('My ID:', id)
       state = states.PLAYING;
+
+      // Create chat input
+      chat_input = createInput('');
+      chat_input.position(10, window.height - 50);
+      chat_input.size(window.width - 20, 20);
+      chat_input.input(() => {
+        chat_message = chat_input.value();
+        // if (keyIsDown(ENTER)) {
+        //   console.log('sent thing');
+        //   socket.emit('chat', chat_message);
+        //   chat_message = '';
+        // }
+      });
+      //chat_input.s
     }
   })
 
@@ -70,6 +88,32 @@ function setup() {
   button.mousePressed(log_in);
 }
 
+function draw_chat(msg, x, y) {
+  if (msg.length == 0) return;
+  fill(255);
+  triangle(x + 60, y + 20, x + 80, y + 30, x + 80, y + 25);
+  rect(x+80, y+20, 8*msg.length, 20);
+  textSize(16);
+  fill(0);
+  text(msg, x+86, y+36);
+}
+
+function keyPressed() {
+  // console.log(state);
+  // console.log(state == states.PLAYING);
+  // console.log(keyCode === ENTER);
+  // console.log(chat_message.length > 0);
+  if (state === states.PLAYING && keyCode === ENTER && chat_message.length > 0) {
+    console.log('sent:', chat_message);
+    socket.emit('chat', chat_message);
+    console.log(chat_input);
+    last_msg = chat_message;
+    chat_message = '';
+    // Change value of underlying input field
+    chat_input.elt.value = '';
+  }
+}
+
 function log_in(){
   if (username.length > 0) {
     console.log('Login: ' + username);
@@ -99,18 +143,35 @@ function log_in(){
 function draw_players() {
   for (player_id in players) {
     if (player_id == id) continue;
-
     player = players[player_id];
     //console.log('Drawing user: ', player.username)
     
     let img = avatar_images[player.avatar];
     image(img, player.position.x, player.position.y, 100, 100);
+
+    push();
+    textSize(20);
+    textAlign(CENTER);
+    text(player.username, player.position.x+40, player.position.y - 10);
+    pop();
+
+    draw_chat(player.last_msg, player.position.x, player.position.y);
   }
 
-  image(avatar_images['sloth1.png'], 400, 400);
+  //image(avatar_images['sloth1.png'], 400, 400);
 
   // Draw self
   image(avatar_images[avatar], x, y, 100, 100);
+  // Draw username
+  push();
+  textSize(20);
+  textAlign(CENTER);
+  text(username, x+40, y - 10);
+  pop();
+  // Draw last chat message
+  draw_chat(last_msg, x, y);
+  //textSize(12);
+  //text(last_msg, x, y - 40);
 }
 
 function draw() {
@@ -127,7 +188,7 @@ function draw() {
     text('CONNECTING...', 100, 100);
   } else if (state === states.PLAYING) {
     draw_players();
-    
+
     dir = createVector(0, 0);
     if (keyIsDown(LEFT_ARROW)) {
       dir.x -= 1;
