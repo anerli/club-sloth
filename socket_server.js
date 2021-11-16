@@ -45,6 +45,11 @@ const build_socket = (server) => {
         players[socket.id].position = pos;
       });
   }
+
+  io.sockets.on('disconnect', (socket) => {
+    console.log('Disconnect: ' + socket.id);
+    delete players[socket.id];
+  });
 }
 
 exports.build_socket = build_socket;
