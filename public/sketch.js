@@ -24,8 +24,6 @@ function setup() {
   createCanvas(1200, 600);
   colorMode(HSB, 255);
 
-  //random
-
   // May want this to match the FPS on server,
   // Alternatively can set frameRate to 0 and manually call draw in heartbeat.
   frameRate(30);
@@ -52,10 +50,7 @@ function setup() {
   inp.style('font-family', 'Wingdings');
   inp.style('font-size', '32px');
   inp.input(() => {
-    //console.log(inp.value());
     username = inp.value();
-    // Delete extra DOM elements
-    //removeElements();
   });
 
   // Get sloths
@@ -87,12 +82,6 @@ function log_in(){
     // Hopefully image paths are loaded at this point
     // random(sloth_img_paths); didn't work
     avatar = sloth_img_paths[Math.floor(Math.random() * sloth_img_paths.length)];
-    //console.log('avatar_path:', avatar_path);
-    
-    // avatar = createImg(avatar_path);
-    // avatar.size(100, 100);
-
-    
 
     x = 0;
     y = 0;
@@ -107,42 +96,20 @@ function log_in(){
   }
 }
 
-// function keyPressed() {
-//   if (keyCode === LEFT_ARROW) {
-//     x -= speed;
-//   } else if (keyCode === RIGHT_ARROW) {
-//     x += speed
-//   } else if (keyCode === UP_ARROW) {
-//     y -= speed;
-//   } else if (keyCode === DOWN_ARROW) {
-//     y += speed;
-//   }
-// }
 function draw_players() {
-  // let img = avatar_images[avatar_path];
-  // image(img, x, y);
-  console.log('players:', players);
-  //console.log(avatar_images);
   for (player_id in players) {
     if (player_id == id) continue;
 
     player = players[player_id];
     //console.log('Drawing user: ', player.username)
-    //console.log(player.avatar);
     
     let img = avatar_images[player.avatar];
     image(img, player.position.x, player.position.y, 100, 100);
-    //image (img, 200, 200);
   }
-  //console.log(avatar_images['sloth1.png']);
+
   image(avatar_images['sloth1.png'], 400, 400);
 
-  console.log('x:', x);
-  console.log('y:', y);
-
   // Draw self
-  // sometimes player is not in yet
-  //image(avatar_images[players[id].avatar], x, y, 100, 100);
   image(avatar_images[avatar], x, y, 100, 100);
 }
 
@@ -151,7 +118,6 @@ function draw() {
 
   if (state === states.LOGIN) {
     background(200, 255, 255);
-    //console.log('Asd');
     textSize(32);
     text('WELCOME TO CLSLOTHþ UBCLUB SLOTHʭѬ', 50, 50);
     textSize(24);
@@ -161,10 +127,7 @@ function draw() {
     text('CONNECTING...', 100, 100);
   } else if (state === states.PLAYING) {
     draw_players();
-
-    //avatar.position(x, y);
-    //avatar.size(100, 100);
-
+    
     dir = createVector(0, 0);
     if (keyIsDown(LEFT_ARROW)) {
       dir.x -= 1;
