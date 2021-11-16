@@ -115,7 +115,7 @@ function draw_players() {
     //console.log(player.avatar);
     
     let img = avatar_images[player.avatar];
-    image(img, player.position.x, player.position.y);
+    image(img, player.position.x, player.position.y, 100, 100);
     //image (img, 200, 200);
   }
   //console.log(avatar_images['sloth1.png']);
