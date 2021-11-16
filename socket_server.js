@@ -1,7 +1,11 @@
 var socket = require('socket.io');
 
+
 const build_socket = (server) => {
   const io = socket(server);
+
+  // If no pings for 60 frames, disconnect user
+  const dc_threshold = 60;
 
   const fps = 30;
   const frame_time = 1000 / fps;
@@ -16,6 +20,17 @@ const build_socket = (server) => {
       //   player_list.push(players[key]);
       // }
       io.sockets.emit('heartbeat', players);
+
+      for (key in players){
+        let player = players[key];
+        player.dead_timer += 1;
+
+        if (player.dead_timer >= dc_threshold){
+          io.sockets.emit('dc', player);
+          console.log(`${player.username} disconnected (timed out)`);
+          delete players[key];
+        }
+      }
   }
 
   io.sockets.on('connection', new_conn);
@@ -29,11 +44,14 @@ const build_socket = (server) => {
         players[socket.id].last_msg = msg;
       });
 
+      socket.on('alive', () => {
+        if (socket.id in players) players[socket.id].dead_timer = 0
+      });
 
       socket.on('login', (userdata) => {
         console.log('Recieved Login:', userdata);
         // Should include username, avatar, and position
-        players[socket.id] = {last_msg: '', ...userdata};
+        players[socket.id] = {last_msg: '', dead_timer: 0, ...userdata};
         
 
         // Delay slightly so client has time to load in self as user.
@@ -46,10 +64,10 @@ const build_socket = (server) => {
       });
   }
 
-  io.sockets.on('disconnect', (socket) => {
-    console.log('Disconnect: ' + socket.id);
-    delete players[socket.id];
-  });
+  // io.sockets.on('disconnect', (socket) => {
+  //   console.log('Disconnect: ' + socket.id);
+  //   delete players[socket.id];
+  // });
 }
 
 exports.build_socket = build_socket;

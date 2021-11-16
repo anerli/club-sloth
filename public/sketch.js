@@ -36,6 +36,8 @@ function setup() {
 
   socket.on('heartbeat', (data) => {
     players = data;   
+
+    socket.emit('alive');
   });
 
   socket.on('login_success', (data) => {
