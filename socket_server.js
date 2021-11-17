@@ -14,13 +14,13 @@ const build_socket = (server) => {
 
   setInterval(heartbeat, frame_time);
 
-  setTimeout(
-      () => {
-        //console.log(players)
-        io.sockets.emit('dc')
-      }, 
-      10000
-  );
+//   setTimeout(
+//       () => {
+//         //console.log(players)
+//         io.sockets.emit('dc')
+//       }, 
+//       10000
+//   );
 
 
 
@@ -31,16 +31,18 @@ const build_socket = (server) => {
       // }
       io.sockets.emit('heartbeat', players);
 
-      for (key in players){
-        let player = players[key];
+      for (socketid in players){
+        let player = players[socketid];
         player.dead_timer += 1;
 
         if (player.dead_timer >= dc_threshold){
-          io.sockets.emit('dc', player);
-          console.log(`${player.username} disconnected (timed out)`);
-          delete players[key];
+            io.to(socketid).emit('dc', player);
+            console.log(`${player.username} disconnected (timed out)`);
+            delete players[socketid];
         }
       }
+
+      
   }
 
   io.sockets.on('connection', new_conn);
