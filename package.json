@@ -19,6 +19,7 @@
   "homepage": "https://github.com/anerli/p5-socket-game#readme",
   "dependencies": {
     "express": "^4.17.1",
+    "socket.io": "^4.3.2",
     "socketio": "^1.0.0"
   }
 }

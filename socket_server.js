@@ -14,6 +14,16 @@ const build_socket = (server) => {
 
   setInterval(heartbeat, frame_time);
 
+  setTimeout(
+      () => {
+        //console.log(players)
+        io.sockets.emit('dc')
+      }, 
+      10000
+  );
+
+
+
   function heartbeat(){
       // let player_list = [];
       // for (key in players){
@@ -40,8 +50,10 @@ const build_socket = (server) => {
       
       // Example signal. Client side would be: socket.emit('mysignal', data)
       socket.on('chat', (msg) => {
-        console.log('Recieved chat message:', msg);
-        players[socket.id].last_msg = msg;
+        if (socket.id in players) {
+            console.log('Recieved chat message:', msg);
+            players[socket.id].last_msg = msg;
+        }
       });
 
       socket.on('alive', () => {
@@ -60,7 +72,8 @@ const build_socket = (server) => {
 
       socket.on('move', (pos) => {
         //console.log('Recieved Move:', pos);
-        players[socket.id].position = pos;
+        if (socket.id in players)
+            players[socket.id].position = pos;
       });
   }
 

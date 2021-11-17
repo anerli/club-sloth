@@ -3,8 +3,12 @@ var socket;
 const states = {
   LOGIN: 'LOGIN',
   LOADING: 'LOADING',
-  PLAYING: 'PLAYING'
+  PLAYING: 'PLAYING',
+  DISCONNECTED: 'DISCONNECTED'
 }
+
+const server_url = "https://club-sloth.anerli.repl.co";
+// const server_url = "http://localhost:3000"
 
 var state = states.LOGIN;
 var username = '';
@@ -32,7 +36,7 @@ function setup() {
   // Alternatively can set frameRate to 0 and manually call draw in heartbeat.
   frameRate(30);
 
-  socket = io.connect('http://localhost:3000');
+  socket = io.connect(server_url);
 
   socket.on('heartbeat', (data) => {
     players = data;   
@@ -62,6 +66,14 @@ function setup() {
     }
   })
 
+  socket.on('dc', () => {
+      if (state == states.PLAYING) {
+        state = states.DISCONNECTED;
+        removeElements();
+        socket.disconnect();
+      }
+    })
+
   // Setup any other event listeners here
 
   let inp = createInput('');
@@ -75,12 +87,12 @@ function setup() {
 
   // Get sloths
   // If you don't specify json, you get the data as a string
-  httpGet('http://localhost:3000/sloths', 'json', (res) => {
+  httpGet(server_url + '/sloths', 'json', (res) => {
     console.log(res);
     console.log(res.sloths);
     sloth_img_paths = res.sloths;
     sloth_img_paths.forEach((sloth_img_path) => {
-      avatar_images[sloth_img_path] = loadImage('./sloths/' + sloth_img_path);
+      avatar_images[sloth_img_path] = loadImage('https://club-sloth.anerli.repl.co/sloths/' + sloth_img_path);
     });
     console.log('avatar images:', avatar_images);
   });
@@ -134,8 +146,8 @@ function log_in(){
     // random(sloth_img_paths); didn't work
     avatar = sloth_img_paths[Math.floor(Math.random() * sloth_img_paths.length)];
 
-    x = 0;
-    y = 0;
+    x = width/2;
+    y = height/2;
 
     socket.emit('login', {
       username: username,
@@ -213,9 +225,12 @@ function draw() {
     x += dir.x;
     y += dir.y;
 
-    if (dir.x > 0 || dir.y > 0) {
+    if (abs(dir.x) > 0 || abs(dir.y) > 0) {
       socket.emit('move', {x: x, y: y});
     }
+  } else if (state === states.DISCONNECTED) {
+      textSize(64);
+      text('DISCONNECTED. Refresh to join again.', 100, 100);
   }
 
 }
